@@ -7,68 +7,63 @@ RepositoriesHelper.class_eval do
     Setting.plugin_redmine_revision_branches[setting]
   end
 
-  def linkify_id(html)
-    return html unless @repository.identifier.present?
-    revision_link = link_to(@rev, {:controller => 'repositories',
-                                   :action => 'show',
-                                   :id => @repository.project,
-                                   :repository_id => @repository.identifier,
-                                   :path => to_path_param(@path),
-                                   :rev => @rev})
-    html.sub(content_tag(:td, @rev), content_tag(:td, revision_link)).html_safe
+  def has_branch_detail?(revision)
+    revision.repository.scm.respond_to? :branch_contains
   end
 
-  def has_branch_detail?
-    @repository.scm.respond_to? :branch_contains
-  end
-
-  def insert_branches_detail(html)
-    return html unless has_branch_detail?
+  def insert_branches_detail(html, revision)
+    return html unless has_branch_detail?(revision)
     substring = '</li>'
     location = html.index(substring).to_i + substring.length
-    html.insert(location, branches_html)
+    html.insert(location, branches_html(revision))
   end
 
-  def branches_html
+  def branches_html(revision)
     content_tag(:li) do
       content = content_tag(:strong, "#{l(:label_branch)}")
       content << " "
-      content << "#{@repository.identifier}@ "
-      content << links_to_branches.join(', ').html_safe
+      content << "#{@repository.identifier} @ "
+      content << links_to_branches(revision).join(', ').html_safe
     end
   end
 
-  def links_to_branches
-    return [] unless has_branch_detail?
-    branch_groups.map { |name, branches| branches_link(name, branches) }
-  end
-
-  def branches_link(name, branches)
-    return branch_link(branches.first) if branches.length == 1
-    link =  link_to("[#{name}...]", 'javascript:;', class: 'scm-branch-group').html_safe
-    content_tag(:span, class: 'scm-branch-hide') do
-      link << content_tag(:span, class: 'scm-branches') do
-        branches.map { |branch| branch_link(branch) }.join(', ').html_safe
-      end
+  def link_to_repository_and_branches(revision)
+    return '' unless has_branch_detail?(revision)
+    content_tag(:span) do
+      concat ' @ '
+      concat link_to_repository(revision.repository).html_safe
+      concat ' ('
+      concat links_to_branches(revision).map{ |link| '<em>' + link + '</em>'}.join(', ').html_safe
+      concat ')'
     end
   end
 
-  def branch_link(branch)
-    link_to(branch, {:controller => 'repositories',
-                     :action => 'show',
-                     :id => @repository.project,
-                     :repository_id => @repository.identifier,
-                     :path => to_path_param(@path),
-                     :rev => branch}).html_safe
+  def link_to_repository(repository)
+    link_to(repository.identifier, {
+      :controller => 'repositories',
+      :action => 'show',
+      :id => repository.project,
+      :repository_id => repository.identifier,
+      :path => to_path_param(@path)})
   end
 
-  def branch_groups
-    @repository.scm.branch_contains(@rev).group_by do |branch|
-      branch.downcase
-        .gsub(/^\d+/, '#####')
-        .split(/[\-\._]/)
-        .first
-    end.sort_by { |name, branches| [branches.length, name] }
+  def links_to_branches(revision)
+    branch_names(revision).map { |name| branch_link(revision.repository, name) }
+  end
+
+  def branch_link(repository, branch)
+    link_to(branch, {
+      :controller => 'repositories',
+      :action => 'show',
+      :id => repository.project,
+      :repository_id => repository.identifier,
+      :path => to_path_param(@path),
+      :rev => branch
+    }).html_safe
+  end
+
+  def branch_names(revision)
+    revision.repository.scm.branch_contains(revision.identifier)
   end
 
 end
