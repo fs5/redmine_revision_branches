@@ -27,17 +27,6 @@ RepositoriesHelper.class_eval do
     end
   end
 
-  def link_to_repository_and_branches(revision)
-    return '' unless has_branch_detail?(revision)
-    content_tag(:span) do
-      concat ' @ '
-      concat link_to_repository(revision.repository).html_safe
-      concat ' ('
-      concat links_to_branches(revision).map{ |link| '<em>' + link + '</em>'}.join(', ').html_safe
-      concat ')'
-    end
-  end
-
   def link_to_repository(repository)
     link_to(repository.identifier, {
       :controller => 'repositories',

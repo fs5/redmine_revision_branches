@@ -1,0 +1,10 @@
+<% if !!plugin_redmine_revision_branches('display_under_associated_revisions') && changeset.scmid.present? %>
+<div id="changeset-<%= changeset.id %>-branches" class="changeset journal branches">
+  <p>
+    <%= l(:label_repository) %>
+    <%= link_to_repository(changeset.repository) %>,
+    <%= l(:label_branch) %>:
+    <%= links_to_branches(changeset).join(', ').html_safe %>
+  </p>
+</div>
+<% end %>

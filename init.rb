@@ -1,5 +1,6 @@
 require_dependency 'redmine_revision_branches/git_adapter_patch'
 require_dependency 'redmine_revision_branches/repositories_helper_patch'
+require_dependency 'redmine_revision_branches/issue_revision_hooks'
 
 Redmine::Plugin.register :redmine_revision_branches do
   name 'Revision Branches'
