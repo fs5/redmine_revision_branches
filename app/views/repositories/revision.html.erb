@@ -1,8 +1,8 @@
 <%
    original_partial = File.join(Rails.root, 'app' ,'views', 'repositories', 'revision.html.erb')
-   html = capture { render file: original_partial }
-%>
-<% if !!plugin_redmine_revision_branches('display_under_single_revision') && @changeset.scmid.present?
+   html = capture { render :template => original_partial }
+   if !!plugin_redmine_revision_branches('display_under_single_revision') && @changeset.scmid.present?
     html = insert_branches_detail(html, @changeset)
-  end %>
+  end
+%>
 <%= html %>
