@@ -1,9 +1,10 @@
-module RepositoriesHelperPatch
+require_relative './revision_branches/settings'
+
+module RepositoriesHelperPatches
   RepositoriesHelper.class_eval do
 
-    def plugin_redmine_revision_branches(setting)
-      return nil unless Setting.plugin_redmine_revision_branches.is_a? Hash
-      Setting.plugin_redmine_revision_branches[setting]
+    def display_branches_under_associated_revisions?
+      RevisionBranches::Settings::is_set?('display_under_associated_revisions')
     end
 
     def has_branch_detail?(revision)

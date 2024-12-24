@@ -1,0 +1,7 @@
+<%
+  html = capture { render :template => 'repositories/revision' }
+  if @changeset.scmid.present?
+    html = insert_branches_detail(html, @changeset)
+  end
+%>
+<%= html %>

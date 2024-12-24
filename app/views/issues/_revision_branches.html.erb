@@ -1,4 +1,4 @@
-<% if !!plugin_redmine_revision_branches('display_under_associated_revisions') && changeset.scmid.present? %>
+<% if display_branches_under_associated_revisions? && changeset.scmid.present? %>
 <div id="changeset-<%= changeset.id %>-branches" class="changeset journal branches">
   <p>
     <%= l(:label_repository) %>
